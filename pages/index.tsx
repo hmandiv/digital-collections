@@ -1,86 +1,189 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import Image from 'next/image';
+import { useState } from 'react';
+import { NFTCard } from './components/nftCard';
+import { NFTMint } from './components/nftMint';
 
 const Home: NextPage = () => {
+  const [walletAddress, setWalletAddress] = useState('');
+  const [collectionAddress, setCollectionAddress] = useState('');
+  const [NFTs, setNFTs] = useState([]);
+  const [fetchForCollection, setFetchForCollection] = useState(false);
+  const [fetching, setFetching] = useState(false);
+
+  const api_key = 'ck6bTPdPRI113MJyOwGH-WwIPYbpXBeW';
+  const goerli = 'https://eth-goerli.g.alchemy.com/v2';
+
+  const fetchNFTs = async () => {
+    clear();
+    let nfts;
+    console.log('fetching nfts');
+
+    const baseURL = `${goerli}/${api_key}/getNFTs/`;
+    var requestOptions = {
+      method: 'GET',
+    };
+
+    if (!collectionAddress.length) {
+      const fetchURL = `${baseURL}?owner=${walletAddress}`;
+
+      setFetching(true);
+      nfts = await fetch(fetchURL, requestOptions).then((data) => data.json());
+      setFetching(false);
+    } else {
+      console.log('fetching nfts for collection owned by address');
+      const fetchURL = `${baseURL}?owner=${walletAddress}&contractAddresses%5B%5D=${collectionAddress}`;
+      setFetching(true);
+      nfts = await fetch(fetchURL, requestOptions).then((data) => data.json());
+      setFetching(false);
+    }
+
+    if (nfts) {
+      // const foo = await fetch(
+      //   nfts.ownedNfts[1].tokenUri.raw,
+      //   requestOptions
+      // ).then((data) => {
+      //   console.warn(
+      //     data.json().then((data) => {
+      //       setUrl(data.image);
+      //       console.warn(data);
+      //     })
+      //   );
+      // });
+      console.log('nfts:', nfts);
+      setNFTs(nfts.ownedNfts);
+    }
+  };
+
+  const fetchNFTsForCollection = async () => {
+    clear();
+    if (collectionAddress.length) {
+      var requestOptions = {
+        method: 'GET',
+      };
+      const baseURL = `${goerli}/${api_key}/getNFTsForCollection/`;
+      setFetching(true);
+      const fetchURL = `${baseURL}?contractAddress=${collectionAddress}&withMetadata=${'true'}`;
+      const nfts = await fetch(fetchURL, requestOptions).then((data) =>
+        data.json()
+      );
+      setFetching(false);
+      if (nfts) {
+        console.log('NFTs in collection:', nfts);
+        setNFTs(nfts.nfts);
+      }
+    }
+  };
+
+  const clear = () => {
+    setFetchForCollection(false);
+    setWalletAddress('');
+    setCollectionAddress('');
+    setNFTs([]);
+    setFetching(false);
+  };
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
-
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
-
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
+    <div className="grid">
+      <div className="grid">
+        <div className="flex">
+          <div className="grid justify-items-center bg-yellow-400 border-double border-4 border-purple-300 w-1/3">
+            <h1>Search NFTs</h1>
+            <br />
+            <input
+              onChange={(e) => {
+                setWalletAddress(e.target.value);
+              }}
+              value={walletAddress}
+              type={'text'}
+              placeholder="Add your wallet address"
+            ></input>
+            <br />
+            <input
+              onChange={(e) => {
+                setCollectionAddress(e.target.value);
+              }}
+              value={collectionAddress}
+              type={'text'}
+              placeholder="Add the collection address"
+            ></input>
+            <br />
+            <label className="text-gray-600 ">
+              <input
+                onChange={(e) => {
+                  setFetchForCollection(e.target.checked);
+                }}
+                checked={fetchForCollection}
+                type={'checkbox'}
+                className="mr-2"
+              ></input>
+              Fetch for collection
+            </label>
+            <br />
+            <button
+              className={'disabled:bg-slate-500 text-white bg-blue-400 p-5'}
+              onClick={() => {
+                fetchForCollection ? fetchNFTsForCollection() : fetchNFTs();
+              }}
+            >
+              Let's go!{' '}
+            </button>
+            <br />
+          </div>
+          <div
+            onClick={() => {
+              clear();
+            }}
+            className="grid justify-items-center cursor-pointer bg-blue-400 border-double border-4 border-purple-300 w-1/3"
           >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and its API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+            <div className="flex items-center disabled:bg-slate-500 text-white ">
+              Clear
+            </div>
+          </div>
+          <div className="grid justify-items-center bg-purple-300 border-double border-4 border-purple-300 w-1/3">
+            <h1>Mint NFTs</h1>
+            <NFTMint></NFTMint>
+          </div>
         </div>
-      </main>
-
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
+      </div>
+      {NFTs.length > 0 ? (
+        <div className="grid grid-cols-3">
+          {NFTs.map((nft) => {
+            return (
+              <div className="border-double border-4 border-rose-200">
+                <NFTCard nft={nft}></NFTCard>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div>
+          <br />
+          <br />
+          <br />
+          {fetching && (
+            <div className="border border-blue-300 shadow rounded-md p-4 max-w-sm w-full mx-auto">
+              <div className="animate-pulse flex space-x-4">
+                <div className="rounded-full bg-slate-700 h-10 w-10"></div>
+                <div className="flex-1 space-y-6 py-1">
+                  <h1>Loading...</h1>
+                  <div className="h-2 bg-slate-700 rounded"></div>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="h-2 bg-slate-700 rounded col-span-2"></div>
+                      <div className="h-2 bg-slate-700 rounded col-span-1"></div>
+                    </div>
+                    <div className="h-2 bg-slate-700 rounded"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
