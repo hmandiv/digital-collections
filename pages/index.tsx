@@ -157,7 +157,7 @@ const Home: NextPage = () => {
           </div>
         </div>
         <div className="grid justify-items-center bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 w-1/3">
-          <h1>Search NFTs</h1>
+          <h1>Mint NFTs</h1>
           <br />
           <NFTMint></NFTMint>
         </div>
