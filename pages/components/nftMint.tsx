@@ -33,7 +33,7 @@ export const NFTMint = () => {
         });
       window
         .open(`https://goerli.etherscan.io/tx/${transaction?.hash}`, '_blank')
-        ?.focus();
+        .focus();
     } catch (error) {
       setError(error);
     }
