@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
-import Head from 'next/head';
-import Image from 'next/image';
 import { useState } from 'react';
+import { Loading } from './components/loading';
 import { NFTCard } from './components/nftCard';
 import { NFTMint } from './components/nftMint';
 
@@ -40,18 +39,6 @@ const Home: NextPage = () => {
     }
 
     if (nfts) {
-      // const foo = await fetch(
-      //   nfts.ownedNfts[1].tokenUri.raw,
-      //   requestOptions
-      // ).then((data) => {
-      //   console.warn(
-      //     data.json().then((data) => {
-      //       setUrl(data.image);
-      //       console.warn(data);
-      //     })
-      //   );
-      // });
-      console.log('nfts:', nfts);
       setNFTs(nfts.ownedNfts);
     }
   };
@@ -86,65 +73,93 @@ const Home: NextPage = () => {
 
   return (
     <div className="grid">
-      <div className="grid">
-        <div className="flex">
-          <div className="grid justify-items-center bg-yellow-400 border-double border-4 border-purple-300 w-1/3">
+      <div className="flex">
+        <div className="grid justify-items-center bg-gradient-to-br from-purple-600 to-orange-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 w-1/3">
+          <div className="grid-item">
             <h1>Search NFTs</h1>
             <br />
-            <input
-              onChange={(e) => {
-                setWalletAddress(e.target.value);
-              }}
-              value={walletAddress}
-              type={'text'}
-              placeholder="Add your wallet address"
-            ></input>
-            <br />
-            <input
-              onChange={(e) => {
-                setCollectionAddress(e.target.value);
-              }}
-              value={collectionAddress}
-              type={'text'}
-              placeholder="Add the collection address"
-            ></input>
-            <br />
-            <label className="text-gray-600 ">
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Wallet Address:
+              </label>
+              <input
+                onChange={(e) => {
+                  setWalletAddress(e.target.value);
+                }}
+                value={walletAddress}
+                type="text"
+                id="address"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                Collection Address:
+              </label>
+              <input
+                onChange={(e) => {
+                  setCollectionAddress(e.target.value);
+                }}
+                value={collectionAddress}
+                type="text"
+                id="uri"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              />
+            </div>
+            <div className="flex items-center">
               <input
                 onChange={(e) => {
                   setFetchForCollection(e.target.checked);
                 }}
                 checked={fetchForCollection}
-                type={'checkbox'}
-                className="mr-2"
-              ></input>
-              Fetch for collection
-            </label>
+                id="checked-checkbox"
+                type="checkbox"
+                value=""
+                className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
+              <label className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+                Fetch For Collection
+              </label>
+            </div>
             <br />
             <button
-              className={'disabled:bg-slate-500 text-white bg-blue-400 p-5'}
+              type="button"
               onClick={() => {
                 fetchForCollection ? fetchNFTsForCollection() : fetchNFTs();
               }}
+              className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
             >
-              Let's go!{' '}
+              Go!
+              <svg
+                aria-hidden="true"
+                className="ml-2 -mr-1 w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                ></path>
+              </svg>
             </button>
-            <br />
           </div>
-          <div
-            onClick={() => {
-              clear();
-            }}
-            className="grid justify-items-center cursor-pointer bg-blue-400 border-double border-4 border-purple-300 w-1/3"
-          >
-            <div className="flex items-center disabled:bg-slate-500 text-white ">
-              Clear
-            </div>
+        </div>
+        <div
+          onClick={() => {
+            clear();
+          }}
+          className="grid justify-items-center cursor-pointer bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 w-1/3"
+        >
+          <div className="flex items-center disabled:bg-slate-500 text-white ">
+            Clear
           </div>
-          <div className="grid justify-items-center bg-purple-300 border-double border-4 border-purple-300 w-1/3">
-            <h1>Mint NFTs</h1>
-            <NFTMint></NFTMint>
-          </div>
+        </div>
+        <div className="grid justify-items-center bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 w-1/3">
+          <h1>Search NFTs</h1>
+          <br />
+          <NFTMint></NFTMint>
         </div>
       </div>
       {NFTs.length > 0 ? (
@@ -162,24 +177,7 @@ const Home: NextPage = () => {
           <br />
           <br />
           <br />
-          {fetching && (
-            <div className="border border-blue-300 shadow rounded-md p-4 max-w-sm w-full mx-auto">
-              <div className="animate-pulse flex space-x-4">
-                <div className="rounded-full bg-slate-700 h-10 w-10"></div>
-                <div className="flex-1 space-y-6 py-1">
-                  <h1>Loading...</h1>
-                  <div className="h-2 bg-slate-700 rounded"></div>
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="h-2 bg-slate-700 rounded col-span-2"></div>
-                      <div className="h-2 bg-slate-700 rounded col-span-1"></div>
-                    </div>
-                    <div className="h-2 bg-slate-700 rounded"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+          <Loading fetching={fetching}></Loading>
         </div>
       )}
     </div>
